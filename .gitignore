@@ -1,0 +1,21 @@
+# build artifacts
+/js
+/css
+/node_modules
+
+# composer
+/vendor
+/composer.phar
+
+# testing
+/.phpunit.result.cache
+/.phpunit.cache
+/build
+
+# editors
+/.idea
+/.vscode
+
+# tool caches
+.php-cs-fixer.cache
+.phpunit.result.cache

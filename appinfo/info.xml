@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+    <id>motis</id>
+    <name>Motis</name>
+    <summary>Public transit routing for events, contacts and free route search</summary>
+    <description><![CDATA[Motis brings multimodal public transit routing into Nextcloud, powered by the open-source MOTIS project and the community-run Transitous service.
+
+Planned features (see the repository roadmap):
+- Route search from A to B
+- Direct transit connections to calendar events
+- Transit routes to contact addresses
+
+The app talks to any MOTIS server (default: https://api.transitous.org) through the server-side PHP client sneakyx/motis-php-client, so requests are proxied by your own Nextcloud server and no data is sent to tracking companies.]]></description>
+    <version>0.1.0</version>
+    <licence>agpl</licence>
+    <author>André Scholz</author>
+    <namespace>Motis</namespace>
+    <category>integration</category>
+    <bugs>https://github.com/sneakyx/motis-nextcloud/issues</bugs>
+    <repository>https://github.com/sneakyx/motis-nextcloud</repository>
+    <dependencies>
+        <nextcloud min-version="33" max-version="35"/>
+    </dependencies>
+    <navigations>
+        <navigation>
+            <name>Motis</name>
+            <route>motis.page.index</route>
+        </navigation>
+    </navigations>
+</info>
