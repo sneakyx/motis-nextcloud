@@ -1,0 +1,33 @@
+# Local Nextcloud development instance for the Motis app.
+#
+# The repository root is mounted as the app "motis" (custom_apps).
+# Run "make dev" or:
+#   1. composer install && npm ci && npm run build
+#   2. docker compose up -d
+#   3. docker compose exec -u www-data nextcloud php occ app:enable motis
+#
+# The app is then available at http://localhost:8090 .
+# Port 8090 is chosen to not collide with other services on the host
+# (check with "docker ps" / "ss -tlnp" before changing it).
+name: motis-nextcloud-dev
+
+services:
+  nextcloud:
+    image: nextcloud:35-apache
+    container_name: motis-nextcloud-dev
+    restart: unless-stopped
+    ports:
+      - "8090:80"
+    environment:
+      SQLITE_DATABASE: nextcloud
+      NEXTCLOUD_ADMIN_USER: admin
+      NEXTCLOUD_ADMIN_PASSWORD: admin
+      # Add your host name or IP here if you access the instance from
+      # another machine, e.g. "NEXTCLOUD_TRUSTED_DOMAINS: localhost 192.168.1.50"
+      NEXTCLOUD_TRUSTED_DOMAINS: localhost 127.0.0.1
+    volumes:
+      - nextcloud-data:/var/www/html
+      - ./:/var/www/html/custom_apps/motis
+
+volumes:
+  nextcloud-data:

@@ -1,0 +1,53 @@
+{
+  "name": "motis-nextcloud",
+  "description": "Public transit routing for Nextcloud - powered by MOTIS",
+  "version": "0.1.0",
+  "author": "André Scholz",
+  "bugs": {
+    "url": "https://github.com/sneakyx/motis-nextcloud/issues"
+  },
+  "repository": {
+    "url": "https://github.com/sneakyx/motis-nextcloud",
+    "type": "git"
+  },
+  "homepage": "https://github.com/sneakyx/motis-nextcloud",
+  "license": "AGPL-3.0-or-later",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite --mode production build",
+    "dev": "vite --mode development build",
+    "watch": "vite --mode development build --watch",
+    "lint": "eslint src",
+    "lint:fix": "eslint --fix src",
+    "stylelint": "stylelint src/**/*.scss src/**/*.vue",
+    "stylelint:fix": "stylelint src/**/*.scss src/**/*.vue --fix"
+  },
+  "dependencies": {
+    "@nextcloud/axios": "^2.5.2",
+    "@nextcloud/dialogs": "^7.3.0",
+    "@nextcloud/l10n": "^3.4.1",
+    "@nextcloud/router": "^3.1.0",
+    "@nextcloud/vue": "^9.5.0",
+    "vue": "^3.5.21"
+  },
+  "browserslist": [
+    "extends @nextcloud/browserslist-config"
+  ],
+  "engines": {
+    "node": "^24.0.0",
+    "npm": "^11.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@nextcloud/browserslist-config": "^3.1.2",
+    "@nextcloud/eslint-config": "^9.0.0-rc.9",
+    "@nextcloud/stylelint-config": "^3.2.1",
+    "@nextcloud/typings": "^1.10.0",
+    "@nextcloud/vite-config": "^2.5.2",
+    "@vue/tsconfig": "^0.9.0",
+    "typescript": "^6.0.2",
+    "vite": "^7.3.1",
+    "vue-tsc": "^3.2.5"
+  }
+}
