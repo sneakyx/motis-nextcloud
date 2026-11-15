@@ -28,4 +28,7 @@ The app talks to any MOTIS server (default: https://api.transitous.org) through 
             <route>motis.page.index</route>
         </navigation>
     </navigations>
+    <settings>
+        <admin>OCA\Motis\Settings\Admin</admin>
+    </settings>
 </info>

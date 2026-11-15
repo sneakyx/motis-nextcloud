@@ -1,0 +1,16 @@
+{ "translations": {
+	"Motis settings" : "Motis-Einstellungen",
+	"Configure the MOTIS server connection and control which groups may use the app." : "Konfiguriere die Verbindung zum MOTIS-Server und steuere, welche Gruppen die App nutzen dürfen.",
+	"MOTIS server URL" : "MOTIS-Server-URL",
+	"Leave empty to use the Transitous community server (https://api.transitous.org)." : "Leer lassen, um den Community-Server von Transitous (https://api.transitous.org) zu verwenden.",
+	"API key" : "API-Schlüssel",
+	"Optional authentication token for self-hosted MOTIS servers. It is stored now and used automatically once the PHP client supports authenticated requests." : "Optionaler Authentifizierungs-Token für selbst betriebene MOTIS-Server. Er wird jetzt gespeichert und automatisch verwendet, sobald der PHP-Client authentifizierte Anfragen unterstützt.",
+	"Request timeout (seconds)" : "Zeitlimit für Anfragen (Sekunden)",
+	"Optional: overrides the default request timeout (1-999 seconds)." : "Optional: überschreibt das Standard-Zeitlimit für Anfragen (1-999 Sekunden).",
+	"Allowed groups" : "Erlaubte Gruppen",
+	"Select the groups that may use the app. Without a selection, all users have access." : "Wähle die Gruppen aus, die die App nutzen dürfen. Ohne Auswahl haben alle Benutzer Zugriff.",
+	"Save" : "Speichern",
+	"Saved" : "Gespeichert",
+	"Could not save settings" : "Einstellungen konnten nicht gespeichert werden",
+	"You are not allowed to use the Motis app. Please ask an administrator for access." : "Du bist nicht berechtigt, die Motis-App zu verwenden. Bitte wende dich für den Zugriff an eine Administration."
+} }

@@ -1,0 +1,29 @@
+/**
+ * SPDX-FileCopyrightText: 2026 André Scholz
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+.motis-admin-settings {
+	max-width: 900px;
+}
+
+.motis-admin-settings .motis-admin-label {
+	display: block;
+	font-weight: bold;
+	margin-top: 20px;
+}
+
+.motis-admin-settings .motis-admin-hint {
+	opacity: 0.7;
+}
+
+.motis-admin-settings .motis-admin-groups {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 5px;
+}
+
+.motis-admin-settings .motis-admin-status {
+	margin-inline-start: 12px;
+}
