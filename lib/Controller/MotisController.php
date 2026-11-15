@@ -13,6 +13,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use OCA\Motis\AppInfo\Application;
 use OCA\Motis\Service\AccessService;
+use OCA\Motis\Service\CalendarService;
 use OCA\Motis\Service\RoutingService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -29,6 +30,7 @@ class MotisController extends Controller {
 		private IUserSession $userSession,
 		private AccessService $accessService,
 		private RoutingService $routingService,
+		private CalendarService $calendarService,
 		private LoggerInterface $logger,
 	) {
 		parent::__construct(Application::APP_ID, $request);
@@ -79,5 +81,55 @@ class MotisController extends Controller {
 			$this->logger->warning('Motis plan failed: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			return new JSONResponse(['error' => 'Could not reach the MOTIS server.'], 502);
 		}
+	}
+
+	#[NoAdminRequired, NoCSRFRequired]
+	public function events(?string $from = null, ?string $to = null, ?string $limit = null): JSONResponse {
+		if (!$this->accessService->isAccessAllowed($this->userSession->getUser())) {
+			return new JSONResponse(['error' => 'You are not allowed to use the Motis app.'], 403);
+		}
+
+		$now = new DateTimeImmutable();
+		$fromDate = $this->parseIsoDate($from, $now);
+		if ($fromDate === null) {
+			return new JSONResponse(['error' => 'Invalid "from" date. Use ISO 8601.'], 400);
+		}
+
+		$toDate = $this->parseIsoDate($to, $fromDate->modify('+7 days'));
+		if ($toDate === null) {
+			return new JSONResponse(['error' => 'Invalid "to" date. Use ISO 8601.'], 400);
+		}
+		if ($toDate <= $fromDate) {
+			return new JSONResponse(['error' => 'The end date must be after the start date.'], 400);
+		}
+
+		$parsedLimit = $limit === null ? 20 : (ctype_digit($limit) ? (int)$limit : 0);
+		if ($parsedLimit < 1 || $parsedLimit > 100) {
+			return new JSONResponse(['error' => 'The limit must be between 1 and 100.'], 400);
+		}
+
+		try {
+			return new JSONResponse([
+				'events' => $this->calendarService->getUpcomingEvents($this->userSession->getUser(), $fromDate, $toDate, $parsedLimit),
+			]);
+		} catch (\Exception $e) {
+			$this->logger->warning('Motis events failed: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+			return new JSONResponse(['error' => 'Could not load the calendar events.'], 500);
+		}
+	}
+
+	/**
+	 * Parse an ISO 8601 date, returning the fallback for empty values.
+	 *
+	 * @param string|null $value the date string to parse
+	 * @param DateTimeImmutable $fallback the value to use when the input is empty
+	 *
+	 * @return DateTimeImmutable|null the parsed date or null if the input is invalid
+	 */
+	private function parseIsoDate(?string $value, DateTimeImmutable $fallback): ?DateTimeImmutable {
+		if ($value === null || trim($value) === '') {
+			return $fallback;
+		}
+		return DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, trim($value)) ?: null;
 	}
 }

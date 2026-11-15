@@ -6,24 +6,37 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 	<div class="motis-app">
 		<h2>{{ t('motis', 'Motis') }}</h2>
 
-		<RouteSearchForm @search="onSearch" />
+		<div class="tab-bar" role="tablist">
+			<NcButton :variant="activeTab === 'route' ? 'secondary' : 'tertiary'" @click="activeTab = 'route'">
+				{{ t('motis', 'Connections') }}
+			</NcButton>
+			<NcButton :variant="activeTab === 'calendar' ? 'secondary' : 'tertiary'" @click="activeTab = 'calendar'">
+				{{ t('motis', 'Calendar') }}
+			</NcButton>
+		</div>
 
-		<section v-if="loading" class="results">
-			<NcLoadingIcon :name="t('motis', 'Searching connections')" :size="32" />
-		</section>
+		<div v-if="activeTab === 'route'">
+			<RouteSearchForm :prefill="prefill" @search="onSearch" @prefillApplied="onPrefillApplied" />
 
-		<template v-else-if="results !== null">
-			<h3 v-if="results.length === 0" class="no-results">
-				{{ t('motis', 'No connections found') }}
-			</h3>
-			<div v-else class="results">
-				<ConnectionCard
-					v-for="(itinerary, index) in results"
-					:key="itinerary.startTime + '-' + index"
-					:itinerary="itinerary"
-					:isBest="index === 0" />
-			</div>
-		</template>
+			<section v-if="loading" class="results">
+				<NcLoadingIcon :name="t('motis', 'Searching connections')" :size="32" />
+			</section>
+
+			<template v-else-if="results !== null">
+				<h3 v-if="results.length === 0" class="no-results">
+					{{ t('motis', 'No connections found') }}
+				</h3>
+				<div v-else class="results">
+					<ConnectionCard
+						v-for="(itinerary, index) in results"
+						:key="index"
+						:itinerary="itinerary"
+						:isBest="index === 0" />
+				</div>
+			</template>
+		</div>
+
+		<EventsList v-else @routeTo="onRouteToEvent" />
 	</div>
 </template>
 
@@ -32,9 +45,10 @@ import axios from '@nextcloud/axios'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import { t } from '@nextcloud/l10n'
 import { generateUrl } from '@nextcloud/router'
-import { NcLoadingIcon } from '@nextcloud/vue'
+import { NcButton, NcLoadingIcon } from '@nextcloud/vue'
 import { ref } from 'vue'
 import ConnectionCard from './components/ConnectionCard.vue'
+import EventsList from './components/EventsList.vue'
 import RouteSearchForm from './components/RouteSearchForm.vue'
 
 interface SearchPayload {
@@ -42,6 +56,23 @@ interface SearchPayload {
 	to: { lat: number, lon: number, name: string }
 	time: string | null
 	arriveBy: boolean
+}
+
+interface GeoResult {
+	id: string
+	name: string
+	lat: number
+	lon: number
+	type: string
+}
+
+interface CalendarEvent {
+	title: string
+	location: string
+	start: string
+	end: string | null
+	calendarName: string
+	calendarColor: string | null
 }
 
 interface Leg {
@@ -63,6 +94,8 @@ interface Itinerary {
 
 const results = ref<Itinerary[] | null>(null)
 const loading = ref(false)
+const activeTab = ref<'route' | 'calendar'>('route')
+const prefill = ref<{ destination: GeoResult, time: Date } | null>(null)
 
 /**
  * Run a connection search and display the returned itineraries.
@@ -90,6 +123,35 @@ async function onSearch(payload: SearchPayload): Promise<void> {
 		loading.value = false
 	}
 }
+
+/**
+ * Geocode the location of a calendar event and prefill the route search.
+ *
+ * @param event the calendar event selected in the events list
+ */
+async function onRouteToEvent(event: CalendarEvent): Promise<void> {
+	activeTab.value = 'route'
+	loading.value = true
+	try {
+		const response = await axios.get<GeoResult[]>(generateUrl('/apps/motis/geocode'), {
+			params: { query: event.location },
+		})
+		if (response.data.length === 0) {
+			showError(t('motis', 'Could not find the event location.'))
+			return
+		}
+		prefill.value = { destination: response.data[0], time: new Date(event.start) }
+	} catch {
+		showError(t('motis', 'Could not load connections. Please try again.'))
+	} finally {
+		loading.value = false
+	}
+}
+
+/** Clear the consumed prefill payload. */
+function onPrefillApplied(): void {
+	prefill.value = null
+}
 </script>
 
 <style scoped lang="scss">
@@ -98,6 +160,12 @@ async function onSearch(payload: SearchPayload): Promise<void> {
 }
 
 .motis-app h2 {
+	margin-block-end: 16px;
+}
+
+.tab-bar {
+	display: flex;
+	gap: 4px;
 	margin-block-end: 16px;
 }
 

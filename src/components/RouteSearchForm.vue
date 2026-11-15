@@ -120,7 +120,7 @@ import axios from '@nextcloud/axios'
 import { t } from '@nextcloud/l10n'
 import { generateUrl } from '@nextcloud/router'
 import { NcButton, NcCheckboxRadioSwitch, NcDateTimePicker, NcSelect } from '@nextcloud/vue'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 interface Suggestion {
 	id: string
@@ -134,7 +134,12 @@ interface Suggestion {
 	country?: string | null
 }
 
-const emit = defineEmits<{ (e: 'search', payload: { from: Suggestion, to: Suggestion, time: string | null, arriveBy: boolean }): void }>()
+const props = defineProps<{ prefill: { destination: Suggestion, time: Date } | null }>()
+
+const emit = defineEmits<{
+	(e: 'search', payload: { from: Suggestion, to: Suggestion, time: string | null, arriveBy: boolean }): void
+	(e: 'prefillApplied'): void
+}>()
 
 const from = ref<Suggestion | null>(null)
 const to = ref<Suggestion | null>(null)
@@ -148,6 +153,26 @@ const time = ref<Date>(new Date())
 const typedTooLittle = ref(true)
 
 const canSearch = computed(() => from.value !== null && to.value !== null)
+
+watch(() => props.prefill, (value) => {
+	if (value === null) {
+		return
+	}
+	to.value = value.destination
+	toOptions.value = [value.destination]
+	arriveBy.value = true
+	useNow.value = false
+	time.value = value.time
+	emit('prefillApplied')
+	if (from.value !== null) {
+		emit('search', {
+			from: from.value as Suggestion,
+			to: to.value as Suggestion,
+			time: value.time.toISOString(),
+			arriveBy: true,
+		})
+	}
+})
 
 /**
  * Build the subline label for a geocode suggestion.

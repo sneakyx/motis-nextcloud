@@ -11,6 +11,7 @@ namespace OCA\Motis\Test\Unit\Controller;
 
 use OCA\Motis\Controller\MotisController;
 use OCA\Motis\Service\AccessService;
+use OCA\Motis\Service\CalendarService;
 use OCA\Motis\Service\RoutingService;
 use OCP\IRequest;
 use OCP\IUser;
@@ -24,6 +25,7 @@ class MotisControllerTest extends TestCase {
 	private IUserSession $userSession;
 	private AccessService $accessService;
 	private RoutingService $routingService;
+	private CalendarService $calendarService;
 	private LoggerInterface $logger;
 	private IUser $user;
 
@@ -34,6 +36,7 @@ class MotisControllerTest extends TestCase {
 		$this->userSession = $this->createMock(IUserSession::class);
 		$this->accessService = $this->createMock(AccessService::class);
 		$this->routingService = $this->createMock(RoutingService::class);
+		$this->calendarService = $this->createMock(CalendarService::class);
 		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->user = $this->createMock(IUser::class);
 
@@ -46,6 +49,7 @@ class MotisControllerTest extends TestCase {
 			$this->userSession,
 			$this->accessService,
 			$this->routingService,
+			$this->calendarService,
 			$this->logger,
 		);
 	}
@@ -142,5 +146,86 @@ class MotisControllerTest extends TestCase {
 		$response = $this->createController()->geocode('Marburg');
 
 		$this->assertSame(502, $response->getStatus());
+	}
+
+	public function testEventsReturns403WhenAccessDenied(): void {
+		$this->accessService->method('isAccessAllowed')->with($this->user)->willReturn(false);
+
+		$response = $this->createController()->events();
+
+		$this->assertSame(403, $response->getStatus());
+	}
+
+	public function testEventsReturnsEventsWithDefaults(): void {
+		$this->accessService->method('isAccessAllowed')->with($this->user)->willReturn(true);
+		$events = [['title' => 'Team meeting', 'location' => 'Marburg Hauptbahnhof']];
+		$this->calendarService->expects($this->once())->method('getUpcomingEvents')
+			->with(
+				$this->user,
+				$this->anything(),
+				$this->callback(fn ($to): bool => $to instanceof \DateTimeImmutable),
+				20,
+			)
+			->willReturn($events);
+
+		$response = $this->createController()->events();
+
+		$this->assertSame(200, $response->getStatus());
+		$this->assertSame(['events' => $events], $response->getData());
+	}
+
+	public function testEventsRejectsInvalidFrom(): void {
+		$this->accessService->method('isAccessAllowed')->with($this->user)->willReturn(true);
+
+		$response = $this->createController()->events('not-a-date');
+
+		$this->assertSame(400, $response->getStatus());
+	}
+
+	public function testEventsRejectsInvalidTo(): void {
+		$this->accessService->method('isAccessAllowed')->with($this->user)->willReturn(true);
+
+		$response = $this->createController()->events(null, 'not-a-date');
+
+		$this->assertSame(400, $response->getStatus());
+	}
+
+	public function testEventsRejectsEndBeforeStart(): void {
+		$this->accessService->method('isAccessAllowed')->with($this->user)->willReturn(true);
+
+		$response = $this->createController()->events(
+			'2026-11-16T10:00:00+00:00',
+			'2026-11-16T09:00:00+00:00',
+		);
+
+		$this->assertSame(400, $response->getStatus());
+	}
+
+	public function testEventsAppliesLimit(): void {
+		$this->accessService->method('isAccessAllowed')->with($this->user)->willReturn(true);
+		$this->calendarService->expects($this->once())->method('getUpcomingEvents')
+			->with($this->user, $this->anything(), $this->anything(), 5)
+			->willReturn([]);
+
+		$response = $this->createController()->events(null, null, '5');
+
+		$this->assertSame(200, $response->getStatus());
+	}
+
+	public function testEventsRejectsInvalidLimit(): void {
+		$this->accessService->method('isAccessAllowed')->with($this->user)->willReturn(true);
+
+		$this->assertSame(400, $this->createController()->events(null, null, '0')->getStatus());
+		$this->assertSame(400, $this->createController()->events(null, null, '101')->getStatus());
+		$this->assertSame(400, $this->createController()->events(null, null, 'many')->getStatus());
+	}
+
+	public function testEventsReturns500OnServerError(): void {
+		$this->accessService->method('isAccessAllowed')->with($this->user)->willReturn(true);
+		$this->calendarService->method('getUpcomingEvents')->willThrowException(new \Exception('calendar error'));
+
+		$response = $this->createController()->events();
+
+		$this->assertSame(500, $response->getStatus());
 	}
 }
