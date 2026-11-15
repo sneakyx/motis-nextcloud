@@ -13,5 +13,7 @@ return [
 	'routes' => [
 		['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
 		['name' => 'settings#update', 'url' => '/admin-settings', 'verb' => 'POST'],
+		['name' => 'motis#geocode', 'url' => '/geocode', 'verb' => 'GET'],
+		['name' => 'motis#plan', 'url' => '/plan', 'verb' => 'GET'],
 	],
 ];
