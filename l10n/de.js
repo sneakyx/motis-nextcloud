@@ -33,6 +33,17 @@ OC.L10N.register(
 	"No connections found" : "Keine Verbindungen gefunden",
 	"Could not load connections. Please try again." : "Verbindungen konnten nicht geladen werden. Bitte versuche es erneut.",
 	"Best connection" : "Beste Verbindung",
-	"%n transfer" : ["%n Umstieg", "%n Umstiege"]
+	"%n transfer" : ["%n Umstieg", "%n Umstiege"],
+	"Connections" : "Verbindungen",
+	"Calendar" : "Kalender",
+	"Upcoming events" : "Kommende Termine",
+	"Refresh events" : "Termine aktualisieren",
+	"Loading events" : "Termine werden geladen",
+	"No events with a location found" : "Keine Termine mit Ort gefunden",
+	"Events from your calendars with a location appear here." : "Hier erscheinen Termine aus deinen Kalendern, die einen Ort hinterlegt haben.",
+	"Untitled event" : "Termin ohne Titel",
+	"Show route" : "Route anzeigen",
+	"Could not find the event location." : "Der Ort des Termins konnte nicht gefunden werden.",
+	"Could not load events." : "Termine konnten nicht geladen werden."
 },
 "nplurals=2; plural=(n != 1);");

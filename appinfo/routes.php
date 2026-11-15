@@ -15,5 +15,6 @@ return [
 		['name' => 'settings#update', 'url' => '/admin-settings', 'verb' => 'POST'],
 		['name' => 'motis#geocode', 'url' => '/geocode', 'verb' => 'GET'],
 		['name' => 'motis#plan', 'url' => '/plan', 'verb' => 'GET'],
+	['name' => 'motis#events', 'url' => '/events', 'verb' => 'GET'],
 	],
 ];
