@@ -16,7 +16,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 				label="name"
 				:placeholder="t('motis', 'Search for a start location')"
 				@search="onSearchFrom">
-				<template #option="{ option }">
+				<template #option="option">
 					<div class="suggestion">
 						<span class="type-badge" :class="[option.type === 'STOP' ? 'stop' : 'address']">{{ option.type === 'STOP' ? '🚏' : '📍' }}</span>
 						<div>
@@ -27,11 +27,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 								{{ optionSubline(option) }}
 							</div>
 						</div>
-					</div>
-				</template>
-				<template #no-options>
-					<div class="s-none">
-						{{ typedTooLittle ? t('motis', 'Type at least 3 characters to search') : t('motis', 'No results') }}
 					</div>
 				</template>
 			</NcSelect>
@@ -63,7 +58,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 				label="name"
 				:placeholder="t('motis', 'Search for a destination')"
 				@search="onSearchTo">
-				<template #option="{ option }">
+				<template #option="option">
 					<div class="suggestion">
 						<span class="type-badge" :class="[option.type === 'STOP' ? 'stop' : 'address']">{{ option.type === 'STOP' ? '🚏' : '📍' }}</span>
 						<div>
@@ -74,11 +69,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 								{{ optionSubline(option) }}
 							</div>
 						</div>
-					</div>
-				</template>
-				<template #no-options>
-					<div class="s-none">
-						{{ typedTooLittle ? t('motis', 'Type at least 3 characters to search') : t('motis', 'No results') }}
 					</div>
 				</template>
 			</NcSelect>
@@ -292,12 +282,6 @@ function onSubmit(): void {
 .s-sub {
 	font-size: 12px;
 	color: var(--color-text-maxcontrast);
-}
-
-.s-none {
-	color: var(--color-text-maxcontrast);
-	padding: 6px 12px;
-	font-size: 13px;
 }
 
 .options-row {
